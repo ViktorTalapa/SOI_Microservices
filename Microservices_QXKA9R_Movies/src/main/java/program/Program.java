@@ -12,10 +12,11 @@ public class Program {
             Swarm swarm = new Swarm(args);
             JAXRSArchive deployment = ShrinkWrap.create(JAXRSArchive.class);
             deployment.addPackage(MovieDatabase.class.getPackage());
+            deployment.addAllDependencies();
             swarm.start();
             swarm.deploy(deployment);
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

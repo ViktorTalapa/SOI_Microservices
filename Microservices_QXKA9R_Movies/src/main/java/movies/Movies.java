@@ -91,6 +91,7 @@ public final class Movies {
     getDescriptor() {
         return descriptor;
     }
+
     public interface MovieOrBuilder extends
             // @@protoc_insertion_point(interface_extends:movies.Movie)
             com.google.protobuf.MessageOrBuilder {
@@ -144,6 +145,7 @@ public final class Movies {
         com.google.protobuf.ByteString
         getActorBytes(int index);
     }
+
     public interface MovieIdOrBuilder extends
             // @@protoc_insertion_point(interface_extends:movies.MovieId)
             com.google.protobuf.MessageOrBuilder {
@@ -153,6 +155,7 @@ public final class Movies {
          */
         int getId();
     }
+
     public interface MovieListOrBuilder extends
             // @@protoc_insertion_point(interface_extends:movies.MovieList)
             com.google.protobuf.MessageOrBuilder {
@@ -185,6 +188,7 @@ public final class Movies {
         movies.Movies.MovieOrBuilder getMovieOrBuilder(
                 int index);
     }
+
     public interface MovieIdListOrBuilder extends
             // @@protoc_insertion_point(interface_extends:movies.MovieIdList)
             com.google.protobuf.MessageOrBuilder {
@@ -244,6 +248,7 @@ public final class Movies {
         private Movie(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
             super(builder);
         }
+
         private Movie() {
             title_ = "";
             year_ = 0;
@@ -1133,6 +1138,7 @@ public final class Movies {
 
         private int id_;
         private byte memoizedIsInitialized = -1;
+
         // Use MovieId.newBuilder() to construct.
         private MovieId(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
             super(builder);
@@ -1583,6 +1589,7 @@ public final class Movies {
 
         private java.util.List<movies.Movies.Movie> movie_;
         private byte memoizedIsInitialized = -1;
+
         // Use MovieList.newBuilder() to construct.
         private MovieList(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
             super(builder);
