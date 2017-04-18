@@ -1,6 +1,9 @@
 package movies;
 
-import movies.Movies.*;
+import movies.Movies.Movie;
+import movies.Movies.MovieId;
+import movies.Movies.MovieIdList;
+import movies.Movies.MovieList;
 
 import javax.ws.rs.core.Response;
 import java.io.IOException;
