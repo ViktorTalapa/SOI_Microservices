@@ -16,8 +16,8 @@ public class MovieDatabase implements IMovieDatabase {
     private static final TreeMap<Integer, Movie> movieMap = new TreeMap<>();
 
     @Override
-    public Response getAll() {
-        return Response.ok(MovieList.newBuilder().addAllMovie(movieMap.values()).build().toByteArray()).build();
+    public MovieList getAll() {
+        return MovieList.newBuilder().addAllMovie(movieMap.values()).build();
     }
 
     @Override

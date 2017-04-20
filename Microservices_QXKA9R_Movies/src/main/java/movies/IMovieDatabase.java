@@ -3,13 +3,14 @@ package movies;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.io.InputStream;
+import movies.Movies.*;
 
 @Path("movies")
 public interface IMovieDatabase {
 
     @GET
     @Produces("application/x-protobuf")
-    Response getAll();
+    MovieList getAll();
 
     @GET
     @Path("{id}")
