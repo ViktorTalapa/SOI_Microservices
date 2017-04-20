@@ -1,31 +1,30 @@
 package movies;
 
+import movies.Movies.Movie;
+import movies.Movies.MovieId;
+import movies.Movies.MovieIdList;
+import movies.Movies.MovieList;
+
 import javax.ws.rs.*;
-import javax.ws.rs.core.Response;
-import java.io.InputStream;
-import movies.Movies.*;
 
 @Path("movies")
+@Produces({"application/x-protobuf", "application/json"})
+@Consumes({"application/x-protobuf", "application/json"})
 public interface IMovieDatabase {
 
     @GET
-    @Produces("application/x-protobuf")
     MovieList getAll();
 
     @GET
     @Path("{id}")
-    @Produces("application/x-protobuf")
-    Response get(@PathParam("id") int id);
+    Movie get(@PathParam("id") int id);
 
     @POST
-    @Consumes("application/x-protobuf")
-    @Produces("application/x-protobuf")
-    Response add(InputStream input);
+    MovieId add(Movie movie);
 
     @PUT
     @Path("{id}")
-    @Consumes("application/x-protobuf")
-    void update(@PathParam("id") int id, InputStream input);
+    void update(@PathParam("id") int id, Movie movie);
 
     @DELETE
     @Path("{id}")
@@ -33,6 +32,5 @@ public interface IMovieDatabase {
 
     @GET
     @Path("find")
-    @Produces("application/x-protobuf")
-    Response query(@QueryParam("year") int year, @QueryParam("orderby") String orderBy);
+    MovieIdList query(@QueryParam("year") int year, @QueryParam("orderby") String orderBy);
 }

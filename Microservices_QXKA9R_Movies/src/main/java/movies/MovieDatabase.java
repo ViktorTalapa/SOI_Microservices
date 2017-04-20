@@ -5,9 +5,6 @@ import movies.Movies.MovieId;
 import movies.Movies.MovieIdList;
 import movies.Movies.MovieList;
 
-import javax.ws.rs.core.Response;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -21,29 +18,20 @@ public class MovieDatabase implements IMovieDatabase {
     }
 
     @Override
-    public Response get(int id) {
-        return Response.ok(movieMap.get(id).toByteArray()).build();
+    public Movie get(int id) {
+        return movieMap.get(id);
     }
 
     @Override
-    public Response add(InputStream input) {
-        try {
-            int id = (movieMap.size() != 0) ? movieMap.lastKey() + 1 : 0;
-            movieMap.put(id, Movie.parseFrom(input));
-            return Response.ok(MovieId.newBuilder().setId(id).build().toByteArray()).build();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return Response.serverError().build();
-        }
+    public MovieId add(Movie movie) {
+        int id = (movieMap.size() != 0) ? movieMap.lastKey() + 1 : 0;
+        movieMap.put(id, movie);
+        return MovieId.newBuilder().setId(id).build();
     }
 
     @Override
-    public void update(int id, InputStream input) {
-        try {
-            movieMap.put(id, Movie.parseFrom(input));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void update(int id, Movie movie) {
+        movieMap.put(id, movie);
     }
 
     @Override
@@ -52,17 +40,16 @@ public class MovieDatabase implements IMovieDatabase {
     }
 
     @Override
-    public Response query(int year, String orderBy) {
+    public MovieIdList query(int year, String orderBy) {
         if (!orderBy.equals("Director") && !orderBy.equals("Title"))
-            return Response.serverError().build();
+            return null;
         boolean orderMode = orderBy.equals("Director");
-
         TreeMap<String, Integer> resultMap = new TreeMap<>();
         for (Map.Entry<Integer, Movie> entry : movieMap.entrySet())
             if (entry.getValue().getYear() == year) {
                 String resultKey = (orderMode) ? entry.getValue().getDirector() : entry.getValue().getTitle();
                 resultMap.put(resultKey, entry.getKey());
             }
-        return Response.ok(MovieIdList.newBuilder().addAllId(resultMap.values()).build().toByteArray()).build();
+        return MovieIdList.newBuilder().addAllId(resultMap.values()).build();
     }
 }

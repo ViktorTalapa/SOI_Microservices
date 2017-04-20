@@ -2,56 +2,46 @@ package ticketing;
 
 import banking.IBankingService;
 import movies.IMovieDatabase;
-import movies.Movies.*;
+import movies.Movies.MovieIdList;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import ticketing.Ticketing.*;
 
-import javax.ws.rs.core.Response;
-import java.io.IOException;
-import java.io.InputStream;
-
 public class TicketingService implements ITicketingService {
 
-    private static final String moviesAdress = System.getProperty("microservices.movies.url");
-    private static final String bankingAddress = System.getProperty("microservices.banking.url");
-
-    private ResteasyClient getResteasyClient() {
+    private static ResteasyClient getResteasyClient() {
         return new ResteasyClientBuilder().providerFactory(ResteasyProviderFactory.getInstance()).build();
     }
 
-    private IMovieDatabase getMovieService() {
-        return getResteasyClient().target(moviesAdress).proxy(IMovieDatabase.class);
+    private static IMovieDatabase getMovieService() {
+        return getResteasyClient().target(System.getProperty("microservices.movies.url")).proxy(IMovieDatabase.class);
     }
 
-    private IBankingService getBankingService() {
-        return getResteasyClient().target(bankingAddress).proxy(IBankingService.class);
-    }
-
-    @Override
-    public Response getMovies(InputStream input) {
-        try {
-            GetMoviesRequest request = GetMoviesRequest.parseFrom(input);
-            IMovieDatabase movieService = getMovieService();
-
-            return null;
-        } catch (IOException e) {
-
-            e.printStackTrace();
-            return Response.serverError().build();
-        }
+    private static IBankingService getBankingService() {
+        return getResteasyClient().target(System.getProperty("microservices.banking.url")).proxy(IBankingService.class);
     }
 
     @Override
-    public Response buyTickets(InputStream input) {
-        //Todo
+    public GetMoviesResponse getMovies(GetMoviesRequest request) {
+        GetMoviesResponse.Builder responseBuilder = GetMoviesResponse.newBuilder();
+        IMovieDatabase movieService = getMovieService();
+        MovieIdList movieIdList = movieService.query(request.getYear(), "Title");
+        for (int id : movieIdList.getIdList())
+            responseBuilder.addMovie(Ticketing.Movie.newBuilder()
+                    .setId(id)
+                    .setTitle(movieService.get(id).getTitle())
+                    .build());
+        return responseBuilder.build();
+    }
+
+    @Override
+    public BuyTicketsResponse buyTickets(BuyTicketsRequest request) {
         return null;
     }
 
     @Override
-    public Response getTickets(InputStream input) {
-        //Todo
+    public GetTicketsResponse getTickets(GetTicketsRequest request) {
         return null;
     }
 }

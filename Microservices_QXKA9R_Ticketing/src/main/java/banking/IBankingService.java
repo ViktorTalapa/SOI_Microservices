@@ -1,19 +1,20 @@
 package banking;
 
+import banking.Banking.ChargeCardRequest;
+import banking.Banking.ChargeCardResponse;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Response;
-import java.io.InputStream;
 
 @Path("banking")
+@Produces({"application/x-protobuf", "application/json"})
+@Consumes({"application/x-protobuf", "application/json"})
 public interface IBankingService {
 
     @POST
     @Path("ChargeCard")
-    @Consumes("application/x-protobuf")
-    @Produces("application/x-protobuf")
-    Response chargeCard(InputStream input);
+    ChargeCardResponse chargeCard(ChargeCardRequest request);
 
 }
