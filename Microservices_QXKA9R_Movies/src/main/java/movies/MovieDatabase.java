@@ -5,12 +5,14 @@ import movies.Movies.MovieId;
 import movies.Movies.MovieIdList;
 import movies.Movies.MovieList;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 public class MovieDatabase implements IMovieDatabase {
 
-    private static final TreeMap<Integer, Movie> movieMap = new TreeMap<>();
+    private static final SortedMap<Integer, Movie> movieMap = Collections.synchronizedSortedMap(new TreeMap<>());
 
     @Override
     public MovieList getAll() {
@@ -24,7 +26,9 @@ public class MovieDatabase implements IMovieDatabase {
 
     @Override
     public MovieId add(Movie movie) {
-        int id = (movieMap.size() != 0) ? movieMap.lastKey() + 1 : 0;
+        int id = 1;
+        while (movieMap.containsKey(id))
+            id++;
         movieMap.put(id, movie);
         return MovieId.newBuilder().setId(id).build();
     }
