@@ -4,7 +4,6 @@ import movies.MovieDatabase;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.wildfly.swarm.Swarm;
 import org.wildfly.swarm.jaxrs.JAXRSArchive;
-import providers.JsonProvider;
 import providers.ProtoBufProvider;
 
 public class Program {
@@ -15,7 +14,6 @@ public class Program {
             JAXRSArchive deployment = ShrinkWrap.create(JAXRSArchive.class);
             deployment.addPackage(MovieDatabase.class.getPackage());
             deployment.addPackage(ProtoBufProvider.class.getPackage());
-            deployment.addPackage(JsonProvider.class.getPackage());
             deployment.addAllDependencies();
             swarm.start();
             swarm.deploy(deployment);

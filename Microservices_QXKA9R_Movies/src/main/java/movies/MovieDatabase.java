@@ -5,6 +5,7 @@ import movies.Movies.MovieId;
 import movies.Movies.MovieIdList;
 import movies.Movies.MovieList;
 
+import javax.ws.rs.WebApplicationException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.SortedMap;
@@ -20,16 +21,17 @@ public class MovieDatabase implements IMovieDatabase {
     }
 
     @Override
-    public Movie get(int id) {
+    public Movie get(int id) throws WebApplicationException{
+        if (!movieMap.containsKey(id))
+            throw new WebApplicationException(404);
         return movieMap.get(id);
     }
 
     @Override
     public MovieId add(Movie movie) {
         int id = 1;
-        while (movieMap.containsKey(id))
+        while (movieMap.putIfAbsent(id, movie) != null)
             id++;
-        movieMap.put(id, movie);
         return MovieId.newBuilder().setId(id).build();
     }
 

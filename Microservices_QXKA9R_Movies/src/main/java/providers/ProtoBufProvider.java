@@ -2,6 +2,7 @@ package providers;
 
 import com.google.protobuf.AbstractMessage;
 import com.google.protobuf.Message;
+import com.google.protobuf.util.JsonFormat;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
@@ -13,6 +14,7 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -20,8 +22,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
 @Provider
-@Consumes("application/x-protobuf")
-@Produces("application/x-protobuf")
+@Produces({"application/x-protobuf", "application/json"})
+@Consumes({"application/x-protobuf", "application/json"})
 public class ProtoBufProvider implements MessageBodyReader<Message>, MessageBodyWriter<Message> {
 
     @Override
@@ -36,7 +38,14 @@ public class ProtoBufProvider implements MessageBodyReader<Message>, MessageBody
         try {
             Method newBuilder = type.getMethod("newBuilder");
             AbstractMessage.Builder messageBuilder = (AbstractMessage.Builder) newBuilder.invoke(type);
-            return messageBuilder.mergeFrom(entityStream).build();
+            switch (mediaType.toString()) {
+                case "application/x-protobuf":
+                    messageBuilder.mergeFrom(entityStream).build();
+                    break;
+                case "application/json":
+                    JsonFormat.parser().merge(new InputStreamReader(entityStream), messageBuilder);
+            }
+            return messageBuilder.build();
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             throw new WebApplicationException(e);
         }
@@ -56,6 +65,12 @@ public class ProtoBufProvider implements MessageBodyReader<Message>, MessageBody
     public void writeTo(Message message, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType,
                         MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream)
             throws IOException, WebApplicationException {
-        entityStream.write(message.toByteArray());
+        switch (mediaType.toString()) {
+            case "application/x-protobuf":
+                entityStream.write(message.toByteArray());
+                break;
+            case "application/json":
+                entityStream.write(JsonFormat.printer().print(message).getBytes());
+        }
     }
 }

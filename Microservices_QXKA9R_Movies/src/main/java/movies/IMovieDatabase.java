@@ -17,7 +17,7 @@ public interface IMovieDatabase {
 
     @GET
     @Path("{id}")
-    Movie get(@PathParam("id") int id);
+    Movie get(@PathParam("id") int id) throws WebApplicationException;
 
     @POST
     MovieId add(Movie movie);

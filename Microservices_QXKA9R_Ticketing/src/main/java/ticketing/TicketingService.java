@@ -1,5 +1,6 @@
 package ticketing;
 
+import banking.Banking.ChargeCardRequest;
 import banking.IBankingService;
 import movies.IMovieDatabase;
 import movies.Movies.MovieIdList;
@@ -8,7 +9,13 @@ import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import ticketing.Ticketing.*;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 public class TicketingService implements ITicketingService {
+
+    private static final Map<Integer, Integer> reservations = Collections.synchronizedMap(new HashMap<>());
 
     private static ResteasyClient getResteasyClient() {
         return new ResteasyClientBuilder().providerFactory(ResteasyProviderFactory.getInstance()).build();
@@ -37,11 +44,33 @@ public class TicketingService implements ITicketingService {
 
     @Override
     public BuyTicketsResponse buyTickets(BuyTicketsRequest request) {
-        return null;
+        BuyTicketsResponse.Builder responseBuilder = BuyTicketsResponse.newBuilder();
+        IMovieDatabase movieService = getMovieService();
+        IBankingService bankingService = getBankingService();
+        int movieId = request.getMovieId();
+        if (movieService.get(movieId) == null)
+            responseBuilder.setSuccess(false);
+        else {
+            ChargeCardRequest cardRequest = ChargeCardRequest.newBuilder()
+                    .setCardNumber(request.getCardNumber())
+                    .setAmount(10 * request.getCount())
+                    .build();
+            boolean success = bankingService.chargeCard(cardRequest).getSuccess();
+            responseBuilder.setSuccess(success);
+            if (success)
+                reservations.put(movieId, reservations.getOrDefault(movieId, 0) + request.getCount());
+        }
+        return responseBuilder.build();
     }
 
     @Override
     public GetTicketsResponse getTickets(GetTicketsRequest request) {
-        return null;
+        GetTicketsResponse.Builder responseBuilder = GetTicketsResponse.newBuilder();
+        for (Map.Entry<Integer, Integer> entry : reservations.entrySet())
+            responseBuilder.addTicket(Ticket.newBuilder()
+                    .setMovieId(entry.getKey())
+                    .setCount(entry.getValue())
+                    .build());
+        return responseBuilder.build();
     }
 }
